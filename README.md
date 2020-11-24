@@ -1,8 +1,10 @@
 # Reconciling Functional Programming and Object Oriented Programming
 
-Some time ago I came across a very interesting post on the clean coder blog.
-In this post Uncle Bob tries to reconcile FP and OOP by explaining that both approaches are
-not mutually exclusive but both provide useful principles that go very well together:
+Some time ago I came across a very interesting post on the Clean-Coder-Blog, 
+which kept me busy for months until I finally decided to write this post.
+
+In this post Uncle Bob tries to reconcile FP and OOP concepts by explaining that both approaches are
+not mutually exclusive but both provide useful principles that go very well together and in fact are complementary:
 
 > In this blog I will make the case that while OO and FP are orthogonal, 
 > they are not mutually exclusive. 
@@ -33,7 +35,7 @@ Client code will just call `shape.draw()`, not even knowing which actual `Shape`
 polymorphism provides a very useful decoupling of clients from the callees by using the methods of the baseclass `Shape`
 as the API for all Objects inheriting `Shape`.
 
-This mechanism alows to build elegant design like the 
+This mechanism allows to build elegant design like the 
 [Model-View-Controller (MVC)](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller) pattern 
 which is at the core of Smalltalks GUI and which influenced many similar designs in other OO-languages. 
 
@@ -48,12 +50,12 @@ which is at the core of Smalltalks GUI and which influenced many similar designs
 This quote conveys two major achievements of OOP:
 
 1. Decomposing software into separate components with distinct responsibilities
-2. Using protocols - APIs or interfaces as we would say today - to decouple those components and allow for 
+2. Using protocols - APIs or interfaces in todays lingo - to decouple those components and allow for 
 varying implementations.
 
 ## Defining FP
 
-Uncle Bob gives a very brief characterization of functional programming:
+Uncle Bob then gives a very brief characterization of functional programming:
 
 > Referential Transparency – no reassignment of values.
 >
@@ -73,22 +75,19 @@ yet closely related principle, namely **immutability**:
 
 > In object-oriented and functional programming,  an immutable object (unchangeable object) is an object whose **state 
 > cannot be modified after it is created**. [...]
->
-> In imperative programming, values held in program **variables whose content never changes are known as constants** to 
-> differentiate them from variables that could be altered during execution.
 > 
 > [Quoted from Wikipedia](https://en.wikipedia.org/wiki/Immutable_object) 
  
 ## There is no FP vs OOP
 
-Uncle Bob continues his arguments like follows:
+After this dense characterization of the two programming paradigms Uncle Bob continues his arguments like follows:
 
-The two concepts of Polymorphism and Referential transparency are orthogonal. You can have Polymorphism without
+The concepts of Polymorphism and Referential Transparency are orthogonal. You can have Polymorphism without
 Referential Transparency – and vice versa.
 
 But orthogonality does not imply that both concepts are mutually exclusive. 
-It is possible to have languages that support both dynamic polymorphism and referential transparency.  
-It is not only possible, but even desirable to have both concepts supported. 
+It is possible to have languages that support both Dynamic Polymorphism and Referential Transparency.  
+It is not only possible, but even desirable to combine both concepts. 
 
 1. Dynamic Polymorphism is desirable as it allows building strongly decoupled designs.
 
@@ -111,12 +110,44 @@ of software systems:
 > 
 > Uncle Bob
   
-## Polymorphism and Referential Transparency in Haskell
+## Ad-hoc Polymorphism and Referential Transparency in Haskell
 
-Haskell is one of the rare incarnations of a purely functional language.
-So it goes without saying that Referential Transparency, Purity and Immutability are a given in Haskell.
-Yes, there are things like `unsafePerformIO` but overall
-it's very easy to write clean code in Haskell due to the strict separation of pure and impure code.
+In this section I'm showcasing how those two concepts are supported in Haskell and can be combined without sacrificing FP principles.
+
+1. **Referential Transparency**
+    
+    Haskell is one of the rare incarnations of a purely functional language.
+    So it goes without saying that Referential Transparency, Purity and Immutability are a given in Haskell.
+    Yes, there are things like `unsafePerformIO` but overall
+    it's very easy to write clean code in Haskell due to the strict separation of pure and impure code.
+    
+    Referential Transparency in Haskell is so much a given that it's quite possible to apply
+    equational reasoning to proof certain properties of Haskell programs.
+    See for example the following [Proof of Functor laws for the Maybe type](https://github.com/thma/WhyHaskellMatters/blob/master/functor-proof.md).
+    What's remarkable here is that you can use the same language to write your code and to 
+    reason about it. 
+    This is not possible in languages that do not provide Referential Transparency. To reason about
+    programs in such languages you'll have to use external models like an abstract stack + register machine.
+    
+
+2. **Ad-hoc Polymorphism** 
+
+    Being able to overload functions and operators with different implementations depending on the 
+    type of its arguments is called Ad-hoc Polymorphism.
+    For example, the `+` operator does something entirely different when applied to floating-point 
+    values as compared to when applied to integers. In Haskell, this kind of polymorphism is achieved with 
+    type classes and class instances.
+    
+    Haskell's type classes are quite different from the classes 
+    in OOP languages. Yet they have more in common with interfaces, in that they 
+    specify a set of functions with their respective type signatures, to be implemented by instance 
+    declarations.
+
+Let's have a look at a simple example.
+
+
+
+**Still work in progress**
 
  
 
