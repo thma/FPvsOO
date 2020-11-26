@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4845572db7086c9e63381c50a907d74f6f9ecd97c96f29f01b4cf9cd3783268c
+-- hash: d98c776c28c28923e9c947779e944c0ccafbc1cfd3e6d9ce68f75cd148c0ac17
 
 name:           FPvsOO
 version:        0.1.0.0
@@ -33,18 +33,6 @@ library
       src
   build-depends:
       base >=4.7 && <5
-  default-language: Haskell2010
-
-executable FPvsOO
-  main-is: Main.hs
-  other-modules:
-      Paths_FPvsOO
-  hs-source-dirs:
-      app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      FPvsOO
-    , base >=4.7 && <5
   default-language: Haskell2010
 
 test-suite FPvsOO-test

@@ -1,4 +1,4 @@
-# Reconciling Functional Programming and Object Oriented Programming
+# Reconciling concepts from Functional Programming and Object Oriented Programming
 
 Some time ago I came across a very interesting post on the Clean-Coder-Blog, 
 which kept me busy for months until I finally decided to write this post.
@@ -123,7 +123,8 @@ In this section I'm showcasing how those two concepts are supported in Haskell a
     
     Referential Transparency in Haskell is so much a given that it's quite possible to apply
     equational reasoning to proof certain properties of Haskell programs.
-    See for example the following [Proof of Functor laws for the Maybe type](https://github.com/thma/WhyHaskellMatters/blob/master/functor-proof.md).
+    See for example the following 
+    [Proof of Functor laws for the Maybe type](https://thma.github.io/LambdaBlog/posts/2020-04-17-maybe-functor-law-proof.html).
     What's remarkable here is that you can use the same language to write your code and to 
     reason about it. 
     This is not possible in languages that do not provide Referential Transparency. To reason about
