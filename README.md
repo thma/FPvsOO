@@ -144,9 +144,66 @@ In this section I'm showcasing how those two concepts are supported in Haskell a
     specify a set of functions with their respective type signatures, to be implemented by instance 
     declarations.
 
-Let's have a look at a simple example.
+Let's have a look at a simple example that is frequently used in introductions to OOP: 
+a class hierarchy representing geometrical shapes. In a typical OO language, we would
+have an abstract base class `Shape` specifying a set of methods and concrete classes 
+`Rect`, `Circle`, `Triangle`, etc. which would implement specific functionality.
 
 
+In Haskell there is no inheritance between types. But with type classes we can specify an
+interface which must be implemented by types instantiating the type class. So we start with a 
+`Shape` type class:
+
+
+```haskell
+-- | The Shape type class. It defines four functions that all concrete Shape types must implement.
+class Shape a where
+  -- | render a Shape
+  draw   :: a -> IO ()
+  -- | move a Shape by an x and y amount
+  move   :: Double -> Double -> a -> a
+  -- | compute the area of a Shape
+  area   :: a -> Double
+  -- | compute the circumference of a Shape
+  circum :: a -> Double
+```
+
+Any concrete type `a` instantiating `Shape` must implement the four functions `draw`, `move`,
+`area` and `circum`. 
+
+We start with a `Circle` type:
+
+```haskell
+-- | a circle defined by the centre point and a radius
+data Circle = Circle Point Double deriving (Show)
+
+-- | a point in the two-dimensional plane
+data Point = Point Double Double
+
+-- | making Circle an instance of Shape
+instance Shape Circle where
+  draw     (Circle centre radius) = putStrLn $ "Circle [" ++ show centre ++ ", " ++ show radius ++ "]"
+  move x y (Circle centre radius) = Circle (movePoint x y centre) radius
+  area   (Circle _ r) = r ^ 2 * pi
+  circum (Circle _ r) = 2 * r * pi
+
+-- | move a Point by an x and y amount
+movePoint :: Double -> Double -> Point -> Point
+movePoint x y (Point x_a y_a) = Point (x_a + x) (y_a + y)
+```
+
+As you can see, I'm not going to implement any graphical rendering in `draw` but simply
+printing out the coordinates of the centre point and the radius.
+
+But at least `area` and `circum` implement the well known geometrical properties of a circle.
+
+```haskell
+-- | a rectangle defined by to points (bottom left and top right corners) 
+data Rect = Rect Point Point deriving (Show)
+
+-- | a triangle defined by three points
+data Triangle = Triangle Point Point Point deriving (Show)
+```
 
 **Still work in progress**
 
