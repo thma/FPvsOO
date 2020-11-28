@@ -4,6 +4,7 @@
 module Lib where
 
 import           Data.Function ((&))
+import Data.Dynamic
 
 -- | a point in the two-dimensional plane
 data Point = Point Double Double
@@ -88,17 +89,28 @@ distance (Point x_a y_a) (Point x_b y_b) = sqrt ((x_b - x_a) ^ 2 + (y_b - y_a) ^
 instance Show Point where
   show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
 
-data ShapeType = forall a . Shape a => MkShape a
+--data ShapeType = forall a . Shape a => MkShape a
 
+data ShapeType
+  where
+  MkShape :: Shape a => a -> ShapeType
 
 instance Shape ShapeType where
   area     (MkShape a) = area a
   circum   (MkShape a) = circum a
   draw     (MkShape a) = draw a
-  move (x,y) (MkShape i) =  undefined
+  --move (x,y) (MkShape i) =  move (x,y) i
 
 pack :: Shape a => a -> ShapeType
 pack = MkShape
+
+
+rect :: Rect
+rect = Rect (Point 0 0) (Point 5 4)
+circle :: Circle
+circle = Circle (Point 4 5) 4
+triangle :: Triangle
+triangle = Triangle (Point 0 0) (Point 4 0) (Point 4 3)
 
 main :: IO ()
 main = do

@@ -161,7 +161,7 @@ class Shape a where
   -- | render a Shape
   draw   :: a -> IO ()
   -- | move a Shape by an x and y amount
-  move   :: Double -> Double -> a -> a
+  move   :: (Double,Double) -> a -> a
   -- | compute the area of a Shape
   area   :: a -> Double
   -- | compute the circumference of a Shape
@@ -182,8 +182,8 @@ data Point = Point Double Double
 
 -- | making Circle an instance of Shape
 instance Shape Circle where
-  draw     (Circle centre radius) = putStrLn $ "Circle [" ++ show centre ++ ", " ++ show radius ++ "]"
-  move x y (Circle centre radius) = Circle (movePoint x y centre) radius
+  draw       (Circle centre radius) = putStrLn $ "Circle [" ++ show centre ++ ", " ++ show radius ++ "]"
+  move (x,y) (Circle centre radius) = Circle (movePoint x y centre) radius
   area   (Circle _ r) = r ^ 2 * pi
   circum (Circle _ r) = 2 * r * pi
 
@@ -195,17 +195,132 @@ movePoint x y (Point x_a y_a) = Point (x_a + x) (y_a + y)
 As you can see, I'm not going to implement any graphical rendering in `draw` but simply
 printing out the coordinates of the centre point and the radius.
 
-But at least `area` and `circum` implement the well known geometrical properties of a circle.
+But at least `area` and `circum` implement the well-known geometrical properties of a circle.
+
+Following this approach it's straightforward to implement data types `Rect` and `Triangle`. Let's start with
+`Rect`:
 
 ```haskell
 -- | a rectangle defined by to points (bottom left and top right corners) 
 data Rect = Rect Point Point deriving (Show)
 
+-- | making Rect an instance of Shape
+instance Shape Rect where
+  draw       (Rect a b) = putStrLn $ "Rectangle [" ++ show a ++ ", " ++ show b ++ "]"
+  move (x,y) (Rect a b) = Rect a' b'
+    where
+      a' = movePoint x y a
+      b' = movePoint x y b
+  area rect   = width * height
+    where
+      (width, height) = widthAndHeight rect
+  circum rect = 2 * (width + height)
+    where
+      (width, height) = widthAndHeight rect
+
+-- | computes the width and height of a rectangle, returns them as a tuple
+widthAndHeight :: Rect -> (Double, Double)
+widthAndHeight (Rect (Point x_a y_a) (Point x_b y_b)) = (abs (x_b - x_a), abs (y_b - y_a))
+```
+
+There is nothing special here, we are just implementing the functions spefified by the `Shape` type class
+in a most simple way.
+
+On to `Triangle`: 
+
+```haskell
 -- | a triangle defined by three points
 data Triangle = Triangle Point Point Point deriving (Show)
+
+-- | making Triangle an instance of Shape
+instance Shape Triangle where
+  draw       (Triangle a b c) = putStrLn $ "Triangle [" ++ show a ++ ", " ++ show b ++ ", " ++ show c ++ "]"
+  move (x,y) (Triangle a b c) = Triangle a' b' c'
+    where
+      a' = movePoint x y a
+      b' = movePoint x y b
+      c' = movePoint x y c
+  area   triangle = sqrt (s * (s - a) * (s - b) * (s - c)) -- using Heron's formula
+    where
+      s = 0.5 * circum triangle
+      (a, b, c) = sides triangle
+  circum triangle = a + b + c
+    where
+      (a, b, c) = sides triangle
+
+-- | computing the length of all sides of a triangle, returns them as a triple
+sides :: Triangle -> (Double, Double, Double)
+sides (Triangle x y z) = (distance x y, distance y z, distance x z)
+
+-- | compute the distance between two points
+distance :: Point -> Point -> Double
+distance (Point x_a y_a) (Point x_b y_b) = sqrt ((x_b - x_a) ^ 2 + (y_b - y_a) ^ 2)
+
+-- | provide a dense representation of a point
+instance Show Point where
+  show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
 ```
+
+Now let's create three sample instances:
+
+```haskell
+rect :: Rect
+rect = Rect (Point 0 0) (Point 5 4)
+
+circle :: Circle
+circle = Circle (Point 4 5) 4
+
+triangle :: Triangle
+triangle = Triangle (Point 0 0) (Point 4 0) (Point 4 3)
+```
+
+Now we have all ingredients at hand for a little demo. 
+
+The type class `Shape` specifies a function `draw :: Shape a => a -> IO ()`.
+This function is polymorphic in its argument: it will take an argument of any type `a` 
+instantiating `Shape` and will perform an `IO ()` action, rendering the shape to the console in our case.
+
+Let's try it in GHCi:
+
+```haskell
+> draw circle
+Circle [(4.0,5.0), 4.0]
+> draw rect
+Rectangle [(0.0,0.0), (5.0,4.0)]
+> draw triangle
+Triangle [(0.0,0.0), (4.0,0.0), (4.0,3.0)]
+```
+
+By importing the reversed application operator `(&)` we can create a more OOP look-and-feel to our code:
+
+```haskell
+> import Data.Function
+> circle & draw
+Circle [(4.0,5.0), 4.0]
+```
+
+We can use the `(&)` operator to even work in a **fluent api** style:
+
+```haskell
+main :: IO ()
+main = do
+  rect
+    & move (4,2)
+    & draw
+
+  circle
+    & move (4,2)
+    & draw
+```
+
+
+
+
 
 **Still work in progress**
 
- 
+ ```haskell
+ (&) :: a -> (a -> b) -> b
+ x & f = f x
+ ```
 
