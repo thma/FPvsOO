@@ -345,7 +345,7 @@ shapes :: [Shape]
 shapes = [circle,rect,triangle]
 ```
 
-because type classes are not types, but constraints.
+because **type classes are** not types, but **constraints on types**.
 
 So in haskell a list like `[circle,rect,triangle]` is considered to be heterogeneous, as the concrete
 types of all the elements differ.
@@ -368,9 +368,14 @@ the wrapped types:
 
 ```haskell
 instance Shape ShapeType where
-  area     (MkShape a) = area a
-  circum   (MkShape a) = circum a
-  draw     (MkShape a) = draw a
+  area     (MkShape s) = area s
+  circum   (MkShape s) = circum s
+  draw     (MkShape s) = draw s
+  move vec (MkShape s) = MkShape (move vec s)
+
+-- we also have to manually derive a Show instance as auto deriving is not possible on the existential type
+instance Show ShapeType where
+  show (MkShape s) = show s
 ```
 
 Now we can define a list of shapes as follows:
@@ -380,34 +385,34 @@ shapes :: [ShapeType]
 shapes = [MkShape rect, MkShape circle, MkShape triangle]
 ```
 
-And finally, we are able to work with this list just with any other:
+Finally, we are able to use this list just as any other:
 
 ```haskell
 main :: IO ()
 main = do
   print $ map area shapes
   print $ map circum shapes
+  print $ map (move (4,10)) shapes
+  putStrLn ""
   mapM_ draw shapes
 
 -- and then in GHCi:
 > main
 [20.0,50.26548245743669,6.0]
 [18.0,25.132741228718345,12.0]
+[Rect (4.0,10.0) (9.0,14.0),Circle (8.0,15.0) 4.0,Triangle (4.0,10.0) (8.0,10.0) (8.0,13.0)]
+
 Rectangle [(0.0,0.0), (5.0,4.0)]
 Circle [(4.0,5.0), 4.0]
 Triangle [(0.0,0.0), (4.0,0.0), (4.0,3.0)]
 ```
 
-**Still work in progress**
+## Conclusion
 
-I still have to find out why
+tbd.
 
-```haskell
-instance Shape ShapeType where
-  area     (MkShape a) = area a
-  circum   (MkShape a) = circum a
-  draw     (MkShape a) = draw a
-  move (x,y) (MkShape i) =  move (x,y) i
-```
+---
 
-does not compile, with 
+## Acknowledgements
+
+Thanks to [David Feuer](https://github.com/treeowl) for helping me with a stupid error in the existential type code!

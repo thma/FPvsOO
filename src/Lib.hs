@@ -1,10 +1,8 @@
 {-# LANGUAGE ExistentialQuantification #-}
-{-# LANGUAGE GADTs #-}
 
 module Lib where
 
 import           Data.Function ((&))
-import Data.Dynamic
 
 -- | a point in the two-dimensional plane
 data Point = Point Double Double
@@ -89,21 +87,16 @@ distance (Point x_a y_a) (Point x_b y_b) = sqrt ((x_b - x_a) ^ 2 + (y_b - y_a) ^
 instance Show Point where
   show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
 
-data ShapeType = forall a . Shape a => MkShape a
-
---data ShapeType
---  where
---  MkShape :: Shape a => a -> ShapeType
+data ShapeType = forall a . (Show a, Shape a) => MkShape a
 
 instance Shape ShapeType where
   area     (MkShape s) = area s
   circum   (MkShape s) = circum s
   draw     (MkShape s) = draw s
-  move (x,y) (MkShape s) =  move (x,y) s
+  move vec (MkShape s) = MkShape (move vec s)
 
-pack :: Shape a => a -> ShapeType
-pack = MkShape
-
+instance Show ShapeType where
+  show (MkShape s) = show s
 
 rect :: Rect
 rect = Rect (Point 0 0) (Point 5 4)
@@ -120,6 +113,7 @@ main :: IO ()
 main = do
   print $ map area shapes
   print $ map circum shapes
+  print $ map (move (4,10)) shapes
   mapM_ draw shapes
 
   putStrLn "draw all shapes:"
