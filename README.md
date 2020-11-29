@@ -1,7 +1,7 @@
 # Reconciling concepts from Functional Programming and Object Oriented Programming
 
 Some time ago I came across a very interesting post on the Clean-Coder-Blog, 
-which kept me busy for months until I finally decided to write this post.
+that kept me busy for months until I finally decided to write this article.
 
 In this post Uncle Bob tries to reconcile FP and OOP concepts by explaining that both approaches are
 not mutually exclusive but both provide useful principles that go very well together and in fact are complementary:
@@ -146,12 +146,16 @@ In this section I'm showcasing how those two concepts are supported in Haskell a
 
 Let's have a look at a simple example that is frequently used in introductions to OOP: 
 a class hierarchy representing geometrical shapes. In a typical OO language, we would
-have an abstract base class `Shape` specifying a set of methods and concrete classes 
-`Rect`, `Circle`, `Triangle`, etc. which would implement specific functionality.
+have an abstract base class `Shape` specifying a set of methods, and concrete classes 
+`Rect`, `Circle`, `Triangle`, etc. which would implement specific behaviour.
+
+This simple class hierarchy is shown in the following UML diagram:
+
+![Shape class hierarchy](classes.png)
 
 
 In Haskell there is no inheritance between types. But with type classes we can specify an
-interface which must be implemented by types instantiating the type class. So we start with a 
+*interface* which must be implemented by types instantiating the type class. So we start with a 
 `Shape` type class:
 
 
@@ -192,7 +196,7 @@ movePoint :: Double -> Double -> Point -> Point
 movePoint x y (Point x_a y_a) = Point (x_a + x) (y_a + y)
 ```
 
-As you can see, I'm not going to implement any graphical rendering in `draw` but simply
+As you can see, I'm not going to implement any real graphical rendering in `draw` but simply
 printing out the coordinates of the centre point and the radius.
 
 But at least `area` and `circum` implement the well-known geometrical properties of a circle.
@@ -307,20 +311,103 @@ main = do
   rect
     & move (4,2)
     & draw
+  
+  rect
+    & draw
 
   circle
     & move (4,2)
     & draw
+
+  circle
+    & draw
+
+-- and then in GHCi:
+> main
+Rectangle [(4.0,2.0), (9.0,6.0)]
+Rectangle [(0.0,0.0), (5.0,4.0)]
+Circle [(8.0,7.0), 4.0]
+Circle [(4.0,5.0), 4.0]
 ```
 
+In Haskell all values are immutable: printing the original shapes a second times 
+demonstrates that operations like move are not destructive. 
 
+So with this little setup we have shown that Haskell allows us to have both: Referential Transparency plus ad-hoc
+polymorphism. That is, we can use the essential elements of OOP and FP in one language.
 
+## Heterogeneous collections
 
+In Haskell, container types like lists are polymorphic, but it is not possible to define a list like this:
+
+```haskell
+shapes :: [Shape]
+shapes = [circle,rect,triangle]
+```
+
+because type classes are not types, but constraints.
+
+So in haskell a list like `[circle,rect,triangle]` is considered to be heterogeneous, as the concrete
+types of all the elements differ.
+
+There are [several ways to have heterogeneous collections in Haskell](https://wiki.haskell.org/Heterogenous_collections).
+I will demonstrate just one of them, which is based on *existential types*.
+
+Once we activate the `ExistentialQuantification` language extension, we can define a data type
+`ShapeType` with a single constructor `MkShape` that will take any instance of a concrete type
+instantiating the `Shape` type class:
+
+```haskell
+{-# LANGUAGE ExistentialQuantification #-}
+
+data ShapeType = forall a . Shape a => MkShape a
+```
+
+Now we can make `ShapeType` an instance of `Shape` which will delegate all function calls to
+the wrapped types:
+
+```haskell
+instance Shape ShapeType where
+  area     (MkShape a) = area a
+  circum   (MkShape a) = circum a
+  draw     (MkShape a) = draw a
+```
+
+Now we can define a list of shapes as follows:
+
+```haskell
+shapes :: [ShapeType]
+shapes = [MkShape rect, MkShape circle, MkShape triangle]
+```
+
+And finally, we are able to work with this list just with any other:
+
+```haskell
+main :: IO ()
+main = do
+  print $ map area shapes
+  print $ map circum shapes
+  mapM_ draw shapes
+
+-- and then in GHCi:
+> main
+[20.0,50.26548245743669,6.0]
+[18.0,25.132741228718345,12.0]
+Rectangle [(0.0,0.0), (5.0,4.0)]
+Circle [(4.0,5.0), 4.0]
+Triangle [(0.0,0.0), (4.0,0.0), (4.0,3.0)]
+```
 
 **Still work in progress**
 
- ```haskell
- (&) :: a -> (a -> b) -> b
- x & f = f x
- ```
+I still have to find out why
 
+```haskell
+instance Shape ShapeType where
+  area     (MkShape a) = area a
+  circum   (MkShape a) = circum a
+  draw     (MkShape a) = draw a
+  move (x,y) (MkShape i) =  move (x,y) i
+```
+
+does not compile, with 

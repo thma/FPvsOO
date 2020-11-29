@@ -89,17 +89,17 @@ distance (Point x_a y_a) (Point x_b y_b) = sqrt ((x_b - x_a) ^ 2 + (y_b - y_a) ^
 instance Show Point where
   show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
 
---data ShapeType = forall a . Shape a => MkShape a
+data ShapeType = forall a . Shape a => MkShape a
 
-data ShapeType
-  where
-  MkShape :: Shape a => a -> ShapeType
+--data ShapeType
+--  where
+--  MkShape :: Shape a => a -> ShapeType
 
 instance Shape ShapeType where
-  area     (MkShape a) = area a
-  circum   (MkShape a) = circum a
-  draw     (MkShape a) = draw a
-  --move (x,y) (MkShape i) =  move (x,y) i
+  area     (MkShape s) = area s
+  circum   (MkShape s) = circum s
+  draw     (MkShape s) = draw s
+  move (x,y) (MkShape s) =  move (x,y) s
 
 pack :: Shape a => a -> ShapeType
 pack = MkShape
@@ -112,18 +112,15 @@ circle = Circle (Point 4 5) 4
 triangle :: Triangle
 triangle = Triangle (Point 0 0) (Point 4 0) (Point 4 3)
 
+shapes :: [ShapeType]
+shapes = [MkShape rect, MkShape circle, MkShape triangle]
+
+
 main :: IO ()
 main = do
-  let rect = Rect (Point 0 0) (Point 5 4)
-      circle = Circle (Point 4 5) 4
-      triangle = Triangle (Point 0 0) (Point 4 0) (Point 4 3)
-      list = [pack rect, pack circle, pack triangle]
-
-  print $ map area list
-
-  --mapM_ (draw . move (1, 2)) list
-
-  mapM_ draw list
+  print $ map area shapes
+  print $ map circum shapes
+  mapM_ draw shapes
 
   putStrLn "draw all shapes:"
   draw rect
@@ -135,13 +132,20 @@ main = do
     & move (4,2)
     & draw
 
+  rect & draw
+
   circle
     & move (4,2)
     & draw
+    
+  circle & draw
 
   triangle
     & move (4,2)
     & draw
+
+
+
 
   putStrLn "\ncompute area of all shapes:"
   print (rect & area)
