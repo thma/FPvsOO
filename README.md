@@ -1,9 +1,8 @@
 # Reconciling concepts from Functional Programming and Object Oriented Programming
 
-Some time ago I came across a very interesting post on the Clean-Coder-Blog, 
-that kept me busy for months until I finally decided to write this article.
+Some time ago I came across a very interesting post on the Clean-Coder-Blog, which kept me busy for months until I finally decided to write this article.
 
-In this post Uncle Bob tries to reconcile FP and OOP concepts by explaining that both approaches are
+In that post Uncle Bob tries to reconcile FP and OOP concepts by explaining that both approaches are
 not mutually exclusive but both provide useful principles that go very well together and in fact are complementary:
 
 > In this blog I will make the case that while OO and FP are orthogonal, 
@@ -50,8 +49,9 @@ which is at the core of Smalltalks GUI and which influenced many similar designs
 This quote conveys two major achievements of OOP:
 
 1. Decomposing software into separate components with distinct responsibilities
-2. Using protocols - APIs or interfaces in todays lingo - to decouple those components and allow for 
-varying implementations.
+2. Using protocols - APIs or interfaces in todays lingo - to decouple those components and allow for varying implementations.
+
+It's interesting to note that Uncle Bob does not consider Inheritance or Encapsulation to be the most important and generic concepts in OOP.
 
 ## Defining FP
 
@@ -409,7 +409,15 @@ Triangle [(0.0,0.0), (4.0,0.0), (4.0,3.0)]
 
 ## Conclusion
 
-tbd.
+In our short Demo we have seen that Haskell supports both Referential Transparence and Polymorphism. We have also seen that it's quite possible to extend this approach to structure
+code in way that even has some kind of OOP look-and-feel.
+
+If we follow Uncle Bob's approach to view Polymorphism to be the central concept of OOP (and in consequence regard other important OO features like Inheritance or Encapsulation as not so distinctive), we come to the conclusion that Haskell is well prepared  to accept the virtues propagated by him:
+
+> [...] a good functional program can (and should) be object oriented. And [...] a good object oriented program can (and should) be functional.
+>
+> Uncle Bob
+
 
 ---
 
