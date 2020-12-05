@@ -130,7 +130,6 @@ shapes = [MkShape rect, MkShape circle, MkShape triangle]
 shapes' :: [ShapeType']
 shapes' = [R rect, C circle, T triangle]
 
-
 main :: IO ()
 main = do
   print $ map area shapes
