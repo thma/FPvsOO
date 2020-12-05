@@ -97,6 +97,25 @@ instance Shape ShapeType where
 
 instance Show ShapeType where
   show (MkShape s) = show s
+  
+data ShapeType' = C Circle | R Rect | T Triangle
+
+instance Shape ShapeType' where
+  area (C c) = area c
+  area (R r) = area r
+  area (T t) = area t
+  
+  circum (C c) = circum c
+  circum (R r) = circum r
+  circum (T t) = circum t
+  
+  draw (C c) = draw c
+  draw (R r) = draw r
+  draw (T t) = draw t
+  
+  move vec (C c) = C $ move vec c
+  move vec (R r) = R $ move vec r
+  move vec (T t) = T $ move vec t
 
 rect :: Rect
 rect = Rect (Point 0 0) (Point 5 4)
@@ -108,6 +127,9 @@ triangle = Triangle (Point 0 0) (Point 4 0) (Point 4 3)
 shapes :: [ShapeType]
 shapes = [MkShape rect, MkShape circle, MkShape triangle]
 
+shapes' :: [ShapeType']
+shapes' = [R rect, C circle, T triangle]
+
 
 main :: IO ()
 main = do
@@ -115,6 +137,8 @@ main = do
   print $ map circum shapes
   print $ map (move (4,10)) shapes
   mapM_ draw shapes
+  
+  print $ map area shapes'
 
   putStrLn "draw all shapes:"
   draw rect

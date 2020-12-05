@@ -36,3 +36,4 @@ tests:
     - FPvsOO
     - hspec
     - QuickCheck
+    - containers
