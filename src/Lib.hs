@@ -87,8 +87,10 @@ distance (Point x_a y_a) (Point x_b y_b) = sqrt ((x_b - x_a) ^ 2 + (y_b - y_a) ^
 instance Show Point where
   show (Point x y) = "(" ++ show x ++ "," ++ show y ++ ")"
 
+-- an existential type allows to wrap any Shape instances 
 data ShapeType = forall a . (Show a, Shape a) => MkShape a
 
+-- The instance declaration just delegates all function calls to the concrete types
 instance Shape ShapeType where
   area     (MkShape s) = area s
   circum   (MkShape s) = circum s
@@ -98,8 +100,10 @@ instance Shape ShapeType where
 instance Show ShapeType where
   show (MkShape s) = show s
   
+-- Using a simple sum type as a wrapper to allow a [ShapeType'] list.  
 data ShapeType' = C Circle | R Rect | T Triangle
 
+-- the instance declaration is not that elegant...
 instance Shape ShapeType' where
   area (C c) = area c
   area (R r) = area r
